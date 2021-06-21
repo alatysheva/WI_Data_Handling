@@ -10,7 +10,7 @@ from classes import CSVprocessing, IndexType, APISupplementary, DLISprocessing, 
     Configuration, CheckFunctions, InputXMLprocessing, LASprocessing
 from forms import UploadForm, VisualizeCsvForm, DLISForm, Credentials, Credentials1
 
-# application set up
+# application set up1
 app = Flask('__name__')
 # configure upload folder
 app.config['UPLOAD_PATH'] = 'uploads'
