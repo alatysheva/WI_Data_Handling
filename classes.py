@@ -201,6 +201,7 @@ class InputXMLprocessing:
 
         df = pd.DataFrame(data=datablock, columns=curves)
         return df
+
     pass
 
 
@@ -235,9 +236,11 @@ class DLISprocessing:
 
 class LASprocessing:
     def splitlogs(self, lf, repr):
-        df1 = lf.df()
-        for col in df1.columns:
+        df0 = lf.df()
+        df1 = df0
+        for col in df0.columns:
             if str(col).lower().find(r'tim') != -1:
+                coltime = col
                 df1 = df1.drop(col, axis=1)
                 pass
 
@@ -349,6 +352,11 @@ class LASprocessing:
             RIH = RIH[:RIH.index(max(RIH)) + 1]
         if len(POOH) != 0:
             POOH = POOH[POOH.index(max(POOH)):]
+
+        if df0[coltime].iloc[0] > df0[coltime].iloc[1]:
+            RIH1 = RIH
+            RIH = POOH
+            POOH = RIH1
         return RIH, POOH
 
     pass
@@ -511,6 +519,8 @@ class CSVprocessing:
                 operation = 'RIH'
             elif POOH:
                 operation = 'POOH'
+        else:
+            operation = 'Not defined'
         return operation
 
     def csvcolumns(self, df0, x, y, c):
@@ -887,7 +897,7 @@ class CheckFunctions:
                         recognized.append(dataframe1['Units'].iloc[i])
                         j += 1
                 if j == 0:
-                    recognized.append('Not recognized')
+                    recognized.append('Not found')
             return recognized
         elif type1 == 'csv':
             df2 = data
@@ -981,14 +991,14 @@ class CheckFunctions:
                         k += 1
                         equipmenttype.append(mnem)
                 if k == 0:
-                    equipmenttype.append('Not recognized')
+                    equipmenttype.append('Not found')
                 k = 0
                 for item in WD_dataType_list:
                     if s1[1] == item:
                         datatype.append(item)
                         k += 1
                 if k == 0:
-                    datatype.append('Not recognized')
+                    datatype.append('Not found')
 
                 if indexType == 'date time':
                     k = 0
@@ -997,26 +1007,26 @@ class CheckFunctions:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
                 else:
                     k = 0
                     if re.search('[0-9]', s1[2]) is not None:
                         runnumbers.append(s1[2])
                         k += 1
                     if k == 0:
-                        runnumbers.append('Not recognized')
+                        runnumbers.append('Not found')
                     k = 0
                     for item in lognames:
                         if s1[3] == item:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
             else:
-                equipmenttype.append('Not recognized')
-                datatype.append('Not recognized')
-                runnumbers.append('Not recognized')
-                lognamesrec.append('Not recognized')
+                equipmenttype.append('Not found')
+                datatype.append('Not found')
+                runnumbers.append('Not found')
+                lognamesrec.append('Not found')
 
         return structure, equipmenttype, datatype, runnumbers, lognamesrec
 
@@ -1110,14 +1120,14 @@ class CheckFunctions:
                         k += 1
                         equipmenttype.append(mnem)
                 if k == 0:
-                    equipmenttype.append('Not recognized')
+                    equipmenttype.append('Not found')
                 k = 0
                 for item in WD_dataType_list:
                     if s1[1] == item:
                         datatype.append(item)
                         k += 1
                 if k == 0:
-                    datatype.append('Not recognized')
+                    datatype.append('Not found')
 
                 if indexType == 'date time':
                     k = 0
@@ -1126,26 +1136,26 @@ class CheckFunctions:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
                 else:
                     k = 0
                     if re.search('[0-9]', s1[2]) is not None:
                         runnumbers.append(s1[2])
                         k += 1
                     if k == 0:
-                        runnumbers.append('Not recognized')
+                        runnumbers.append('Not found')
                     k = 0
                     for item in lognames:
                         if s1[3] == item:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
             else:
-                equipmenttype.append('Not recognized')
-                datatype.append('Not recognized')
-                runnumbers.append('Not recognized')
-                lognamesrec.append('Not recognized')
+                equipmenttype.append('Not found')
+                datatype.append('Not found')
+                runnumbers.append('Not found')
+                lognamesrec.append('Not found')
 
         return structure, equipmenttype, datatype, runnumbers, lognamesrec
 
@@ -1222,7 +1232,7 @@ class CheckFunctions:
             if strreg == 'Yes' and strreg1 == 'Yes':
                 result = 'Recognized'
             else:
-                result = 'Not recognized'
+                result = 'Not found'
         else:
             result = 'No tag'
         return description, serviceCategory, dataSource, result
@@ -1246,7 +1256,7 @@ class CheckFunctions:
         if len(missing) != 0:
             missing_string = 'Missing tags: ' + ','.join(missing)
         else:
-            missing_string = 'None'
+            missing_string = 'No missing tags'
         line1 = Bs_data.find_all('mnemonicList')
         line2 = Bs_data.find_all('unitList')
         line0 = []
@@ -1303,14 +1313,14 @@ class CheckFunctions:
                         k += 1
                         equipmenttype.append(mnem)
                 if k == 0:
-                    equipmenttype.append('Not recognized')
+                    equipmenttype.append('Not found')
                 k = 0
                 for item in WD_dataType_list:
                     if s1[1] == item:
                         datatype.append(item)
                         k += 1
                 if k == 0:
-                    datatype.append('Not recognized')
+                    datatype.append('Not found')
 
                 if indexType == 'date time':
                     k = 0
@@ -1319,26 +1329,26 @@ class CheckFunctions:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
                 else:
                     k = 0
                     if re.search('[0-9]', s1[2]) is not None:
                         runnumbers.append(s1[2])
                         k += 1
                     if k == 0:
-                        runnumbers.append('Not recognized')
+                        runnumbers.append('Not found')
                     k = 0
                     for item in lognames:
                         if s1[3] == item:
                             lognamesrec.append(item)
                             k += 1
                     if k == 0:
-                        lognamesrec.append('Not recognized')
+                        lognamesrec.append('Not found')
             else:
-                equipmenttype.append('Not recognized')
-                datatype.append('Not recognized')
-                runnumbers.append('Not recognized')
-                lognamesrec.append('Not recognized')
+                equipmenttype.append('Not found')
+                datatype.append('Not found')
+                runnumbers.append('Not found')
+                lognamesrec.append('Not found')
 
         return structure, equipmenttype, datatype, runnumbers, lognamesrec
 
@@ -1806,6 +1816,338 @@ class XmlGeneration:
             missingOptionalString = 'None'
 
         if len(mnemoniclist) == len(units):
+            missing3 = 'Yes'
+        else:
+            missing3 = 'None'
+
+        return stringfile, missingMandatoryString, missingOptionalString, missing3
+
+    def xmltoxml(self, data, uidWell, uidWellbore, BU, asset, purpose1, servicecompany, wellname1,
+                 idwi,
+                 runid,
+                 servicetype, datatype, uid):
+        mandatory_time = ['name', 'indexType', 'minDateTimeIndex', 'maxDateTimeIndex', 'typeLogData', 'mnemonicList',
+                          'unitList']
+        mandatory_depth = ['name', 'indexType', 'minIndex', 'maxIndex', 'typeLogData', 'mnemonicList', 'unitList']
+        Bs_data = BeautifulSoup(data, 'xml')
+        wellname = wellname1
+        description = str(purpose1)
+        comments = 'BU: ' + str(BU) + '\nAsset:' + str(asset)
+        servicecategory = str(idwi) + ',' + str(runid) + ',' + str(servicetype) + ',' + str(datatype)
+
+        top = Element('logs', xmlns="http://www.witsml.org/schemas/1series", version="1.4.1.1")
+        top_1 = SubElement(top, 'log', uidWell=uidWell, uidWellbore=uidWellbore, uid=uid)
+        top_1_1 = SubElement(top_1, 'nameWell')
+        line1 = Bs_data.find_all(top_1_1.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_1.text = ''.join(index)
+        else:
+            top_1_1.text = wellname
+        top_1_2 = SubElement(top_1, 'nameWellbore')
+        line1 = Bs_data.find_all(top_1_2.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_2.text = ''.join(index)
+        else:
+            top_1_2.text = ''
+        top_1_3 = SubElement(top_1, 'name')
+        line1 = Bs_data.find_all(top_1_3.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_3.text = ''.join(index)
+        else:
+            top_1_3.text = ''
+        top_1_4 = SubElement(top_1, 'serviceCompany')
+        line1 = Bs_data.find_all(top_1_4.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_4.text = ''.join(index)
+        else:
+            top_1_4.text = servicecompany
+        top_1_5 = SubElement(top_1, 'runNumber')
+        line1 = Bs_data.find_all(top_1_5.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_5.text = ''.join(index)
+        else:
+            top_1_5.text = ''
+        top_1_6 = SubElement(top_1, 'creationDate')
+        line1 = Bs_data.find_all(top_1_6.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_6.text = ''.join(index)
+        else:
+            top_1_6.text = ''
+        top_1_7 = SubElement(top_1, 'description')
+        line1 = Bs_data.find_all(top_1_7.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_7.text = ''.join(index)
+        else:
+            top_1_7.text = description
+        top_1_8 = SubElement(top_1, 'indexType')
+        line1 = Bs_data.find_all(top_1_8.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_8.text = ''.join(index)
+        else:
+            top_1_8.text = ''
+        if top_1_8.text == 'date time':
+            top_1_9 = SubElement(top_1, 'startDateTimeIndex')
+            line1 = Bs_data.find_all(top_1_9.tag)
+            index = []
+            if len(line1) > 0:
+                for each in line1:
+                    index.append(each.get_text())
+                top_1_9.text = ''.join(index)
+            else:
+                top_1_9.text = ''
+            top_1_10 = SubElement(top_1, 'endDateTimeIndex')
+            line1 = Bs_data.find_all(top_1_10.tag)
+            index = []
+            if len(line1) > 0:
+                for each in line1:
+                    index.append(each.get_text())
+                top_1_10.text = ''.join(index)
+            else:
+                top_1_10.text = ''
+        elif top_1_8.text == 'measured depth':
+            top_1_9a = SubElement(top_1, 'startIndex')
+            line1 = Bs_data.find_all(top_1_9a.tag)
+            index = []
+            if len(line1) > 0:
+                for each in line1:
+                    index.append(each.get_text())
+                top_1_9a.text = ''.join(index)
+            else:
+                top_1_9a.text = ''
+            top_1_10a = SubElement(top_1, 'endIndex')
+            line1 = Bs_data.find_all(top_1_10a.tag)
+            index = []
+            if len(line1) > 0:
+                for each in line1:
+                    index.append(each.get_text())
+                top_1_10a.text = ''.join(index)
+            else:
+                top_1_10a.text = ''
+        top_1_11 = SubElement(top_1, 'indexCurve')
+        line1 = Bs_data.find_all(top_1_11.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_11.text = ''.join(index)
+        else:
+            top_1_11.text = ''
+        top_1_12 = SubElement(top_1, 'nullValue')
+        line1 = Bs_data.find_all(top_1_12.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_1_12.text = ''.join(index)
+        else:
+            top_1_12.text = ''
+
+        line1 = Bs_data.find_all('logCurveInfo')
+        line2 = Bs_data.find_all('mnemonic')
+        index = []
+        if len(line2) > 0:
+            for each in line2:
+                index.append(each.get_text())
+        line3 = Bs_data.find_all('unit')
+        index1 = []
+        if len(line3) > 0:
+            for each in line3:
+                index1.append(each.get_text())
+
+        line4 = Bs_data.find_all('curveDescription')
+        index2 = []
+        if len(line4) > 0:
+            for each in line4:
+                index2.append(each.get_text())
+        line5 = Bs_data.find_all('dataSource')
+        index3 = []
+        if len(line5) > 0:
+            for each in line5:
+                index3.append(each.get_text())
+        line6 = Bs_data.find_all('typeLogData')
+        index4 = []
+        if len(line6) > 0:
+            for each in line6:
+                index4.append(each.get_text())
+
+        for i in range(len(line1)):
+            top_2 = SubElement(top_1, 'logCurveInfo', uid=str(i))
+            child1 = SubElement(top_2, 'mnemonic')
+            if len(line2) > i:
+                child1.text = index[i]
+            else:
+                child1.text = ''
+            child1a = SubElement(top_2, 'unit')
+            if len(line3) > i:
+                child1a.text = index1[i]
+            else:
+                child1a.text = ''
+            child4 = SubElement(top_2, 'curveDescription')
+            if len(line4) > i:
+                child4.text = index1[i]
+            else:
+                child4.text = ''
+            child4a = SubElement(top_2, 'dataSource')
+            if len(line5) > i:
+                child4a.text = index1[i]
+            else:
+                child4a.text = ''
+            child5 = SubElement(top_2, 'typeLogData')
+            if len(line6) > i:
+                child5.text = index1[i]
+            else:
+                child5.text = ''
+
+        top_3 = SubElement(top_1, 'logData')
+        top_3_1 = SubElement(top_3, 'mnemonicList')
+        line1 = Bs_data.find_all(top_3_1.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_3_1.text = ''.join(index)
+        else:
+            top_3_1.text = ''
+        top_3_2 = SubElement(top_3, 'unitList')
+        line1 = Bs_data.find_all(top_3_2.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_3_2.text = ''.join(index)
+        else:
+            top_3_2.text = ''
+
+        line4 = Bs_data.find_all('data')
+        index = []
+        if len(line4) > 0:
+            for each in line4:
+                index.append(each.get_text())
+        for i in range(len(line4)):
+            top_3_3 = SubElement(top_3, 'data')
+            top_3_3.text = index[i]
+
+        top_4 = SubElement(top_1, 'commonData')
+        top_4_1 = SubElement(top_4, 'dTimCreation')
+        line1 = Bs_data.find_all(top_4_1.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_4_1.text = ''.join(index)
+        else:
+            top_4_1.text = str(datetime.today().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]) + '+00:00'
+
+        top_4_2 = SubElement(top_4, 'comments')
+        line1 = Bs_data.find_all(top_4_2.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_4_2.text = ''.join(index)
+        else:
+            top_4_2.text = comments
+
+        top_4_3 = SubElement(top_4, 'serviceCategory')
+        line1 = Bs_data.find_all(top_4_3.tag)
+        index = []
+        if len(line1) > 0:
+            for each in line1:
+                index.append(each.get_text())
+            top_4_3.text = ''.join(index)
+        else:
+            top_4_3.text = servicecategory
+
+        stringfile = self.prettify(top)
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y %H-%M-%S")
+        desktop = os.path.expanduser("generatedXML/" + str(dt_string) + '.xml')
+        with open(desktop, "w") as f:
+            f.write(stringfile)
+        # tree = ElementTree(top)
+        # tree.write(os.path.expanduser("generatedXML/"+ str(date.today()) +'.xml'))
+
+        missingData = []
+        lst = top.findall('log/')
+        for item in lst:
+            if item.text == '':
+                missingData.append(item.tag)
+
+        lst = top.findall('commonData/')
+        for item in lst:
+            if item.text == '':
+                missingData.append(item.tag)
+
+        lst = top.findall('logCurveInfo/')
+        for item in lst:
+            if item.text == '':
+                missingData.append(item.tag)
+
+        lst = top.findall('logData/')
+        for item in lst:
+            if item.text == '':
+                missingData.append(item.tag)
+
+        # missing = ', '.join(missingData)
+
+        missingMandatory = []
+        missingOptional = []
+
+        for each in missingData:
+            j = 0
+            if top_1_8.text == 'date time':
+                for each1 in mandatory_time:
+                    if each == each1:
+                        missingMandatory.append(each)
+                        j += 1
+            else:
+                for each1 in mandatory_depth:
+                    if each == each1:
+                        missingMandatory.append(each)
+                        j += 1
+            if j == 0:
+                missingOptional.append(each)
+        missingOptional1 = set(missingOptional)
+        missingMandatory1 = set(missingMandatory)
+
+        if len(missingMandatory1) != 0:
+            missingMandatoryString = ', '.join(missingMandatory1)
+        else:
+            missingMandatoryString = 'None'
+        if len(missingOptional1) != 0:
+            missingOptionalString = ', '.join(missingOptional1)
+        else:
+            missingOptionalString = 'None'
+
+        line1 = Bs_data.find_all('mnemonicList')
+
+        line2 = Bs_data.find_all('unitList')
+
+        if len(line1) == len(line2):
             missing3 = 'Yes'
         else:
             missing3 = 'None'

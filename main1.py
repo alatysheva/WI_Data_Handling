@@ -116,14 +116,16 @@ def uploaded():
             indexmain = 'Time'
         elif str(lf.curves[0].mnemonic).lower().find(r'dep') != -1:
             indexmain = 'Depth'
-
-        RIH, POOH = LASprocessing().splitlogs(lf, repr)
-        if len(RIH) != 0 and len(POOH) == 0:
-            operation = 'RIH'
-        elif len(RIH) == 0 and len(POOH) != 0:
-            operation = 'POOH'
+        if index1 is None or index2 is None:
+            operation = 'Impossible to detect'
         else:
-            operation = 'RIH and POOH'
+            RIH, POOH = LASprocessing().splitlogs(lf, repr)
+            if len(RIH) != 0 and len(POOH) == 0:
+                operation = 'RIH'
+            elif len(RIH) == 0 and len(POOH) != 0:
+                operation = 'POOH'
+            else:
+                operation = 'RIH and POOH'
         session['operation'] = operation
         data1 = [['File Name', filename], ['File Type', type1], ['Index Type', indexmain],
                  ['Number of Curves', len(lf.curves)], ['Operation', operation]]
@@ -186,7 +188,7 @@ def uploaded():
                  ['Number of Curves', curvesnumber1], ['Operation', operation]]
 
         df1 = pd.DataFrame(data=data1, columns=['Parameter', 'Value'])
-        template = APISupplementary().uploadedpageXML(index1, index2)
+        template = APISupplementary().uploadedpage(index1, index2)
         return render_template(template, column_names=df.columns,
                                row_data=list(df.values), zip=zip, column_names1=df1.columns,
                                row_data1=list(df1.values), zip1=zip)
@@ -576,7 +578,7 @@ def checking():
         recognized, mnemoniclist, units = CheckFunctions().unitsrecognized(df2, type1)
 
         summary = pd.DataFrame()
-        summary['Description'], summary['Units'],summary['KDI Unit'] =  mnemoniclist,units, recognized
+        summary['Description'], summary['Units'], summary['KDI Unit'] = mnemoniclist, units, recognized
         summary['Mnemonic Structure'], summary['Equipment Type'], summary['Data Type'], summary['Run Number'], summary[
             'Log Name'] = CheckFunctions().checkcsvfunction(indexType, mnemoniclist)
         result = CheckFunctions().csvtimestamp(df2)
@@ -713,16 +715,32 @@ def export1():
             elif type1 == 'csv':
                 data = pd.read_csv(os.path.join(app.config['UPLOAD_PATH'], filename))
                 df = pd.DataFrame(data)
-                df = CSVprocessing().csvpreprocess(df)
-                df = CSVprocessing().csvnumeric(df)
-                x = session.get('x', None)
-                y = int(session.get('y', None))
-                c = int(session.get('c', None))
+                columnHeadingsRow = session.get('columnHeadingsRow', None)
+                unitsRow = int(session.get('unitsRow', None))
+                dataStartRow = int(session.get('dataStartRow'))
+
+                df2 = CSVprocessing().csvcolumns(df, columnHeadingsRow, unitsRow, dataStartRow)
                 wellname = session.get('wellname', None)
-                df2 = CSVprocessing().csvcolumns(df, x, y, c)
-                xmlstring, missing1, missing2, missing3 = XmlGeneration().csvtoxml(df, df2, x, c, filename, uidwell1,
+                xmlstring, missing1, missing2, missing3 = XmlGeneration().csvtoxml(df, df2, columnHeadingsRow,
+                                                                                   dataStartRow, filename, uidwell1,
                                                                                    uidwellbore1,
                                                                                    BU, asset, purpose1,
+                                                                                   servicecompany, wellname, uidWI1,
+                                                                                   runid1,
+                                                                                   servicetype,
+                                                                                   datatype, uid)
+                return render_template('exporttoXML.html', string=xmlstring, missingData=missing1,
+                                       missingData2=missing2,
+                                       missingData3=missing3)
+            elif type1 == 'xml':
+                f = open(os.path.join(app.config['UPLOAD_PATH'], filename), 'r')
+                data1 = f.read()
+                df = InputXMLprocessing().dataframeFromXml(data1)
+
+                xmlstring, missing1, missing2, missing3 = XmlGeneration().xmltoxml(data1, uidwell1,
+                                                                                   uidwellbore1,
+                                                                                   BU, asset,
+                                                                                   purpose1,
                                                                                    servicecompany, wellname, uidWI1,
                                                                                    runid1,
                                                                                    servicetype,

@@ -1,7 +1,6 @@
-Coiled Tubing Operational Data : CT
-Fracturing : FRAC
-Wireline Hoist Data : WL
-Slickline Hoist Data : SL
-Hydraulic Power/Pumping Unit : HPU
-Gas Compressing Unit : GC
+Coiled Tubing : CT
+Wireline : WL
+Slickline : SL
 Heavy Workover Unit : HWU
+Snubbing : SNUB
+Bullheading : BLH
