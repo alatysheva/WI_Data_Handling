@@ -236,6 +236,7 @@ class DLISprocessing:
 
 class LASprocessing:
     def splitlogs(self, lf, repr):
+        coltime = '0'
         df0 = lf.df()
         df1 = df0
         for col in df0.columns:
@@ -353,10 +354,11 @@ class LASprocessing:
         if len(POOH) != 0:
             POOH = POOH[POOH.index(max(POOH)):]
 
-        if df0[coltime].iloc[0] > df0[coltime].iloc[1]:
-            RIH1 = RIH
-            RIH = POOH
-            POOH = RIH1
+        if coltime != '0':
+            if df0[coltime].iloc[0] > df0[coltime].iloc[1]:
+                RIH1 = RIH
+                RIH = POOH
+                POOH = RIH1
         return RIH, POOH
 
     pass
